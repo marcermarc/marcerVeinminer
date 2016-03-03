@@ -1,0 +1,11 @@
+name: marcerVeinminer
+version: 0.3.1-Beta
+author: marcermarc
+main: de.marcermarc.veinminer.Main
+commands:
+  marcerVeinminer:
+    description: Zum Einstellen des Plugins
+    usage: /marcerVeinminer [loadBlocks, saveBlocks, enable, disable, lists <tool> <block>]
+  mV:
+    description: Zum Einstellen des Plugins
+    usage: /mV [loadBlocks, saveBlocks, enable, disable, lists [add, remove] <tool> <block>]
