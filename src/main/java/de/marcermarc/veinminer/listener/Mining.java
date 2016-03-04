@@ -256,7 +256,7 @@ public class Mining implements Listener {
                 case 2:
                     if (ran <= 0.25) iS = new ItemStack(FLINT, 1);
                     break;
-                case 3:
+                default:
                     iS = new ItemStack(FLINT, 1);
             }
             vm.addDropBlock(iS);
@@ -266,6 +266,8 @@ public class Mining implements Listener {
 
             if ((bl.getType().equals(LEAVES) && (bl.getData() == 0 || bl.getData() == 4 || bl.getData() == 8 || bl.getData() == 12)) ||
                     (bl.getType().equals(LEAVES_2) && (bl.getData() == 1 || bl.getData() == 5 || bl.getData() == 9 || bl.getData() == 13))) {
+                double apple
+
                 switch (vm.getLuckLevel()) {
                     case 0:
                         if (ran <= 0.005) vm.addDropBlock(new ItemStack(APPLE, 1));
@@ -282,8 +284,8 @@ public class Mining implements Listener {
                 ran = random.nextDouble();
             }
 
-            double needed = 0.05;
-            switch (vm.getLuckLevel()) {
+            double needed = Math.pow((0.0062 / 3) * vm.getLuckLevel(), 3) + Math.pow(0.01035 * vm.getLuckLevel(), 2) + (0.01265 / 3) * vm.getLuckLevel() + 0.05;
+            /*switch (vm.getLuckLevel()) {
                 case 1:
                     needed = 0.0625;
                     break;
@@ -292,7 +294,7 @@ public class Mining implements Listener {
                     break;
                 case 3:
                     needed = 0.1;
-            }
+            }*/
 
             if (bl.getType().equals(LEAVES)) {
                 switch (bl.getData()) {
@@ -300,25 +302,30 @@ public class Mining implements Listener {
                     case 4:
                     case 8:
                     case 12:
-                        if (ran <= needed) vm.addDropBlock(new ItemStack(SAPLING, 1, (short) 0));
+                        if (needed >= 1 || ran <= needed) vm.addDropBlock(new ItemStack(SAPLING, 1, (short) 0));
                         break;
                     case 1:
                     case 5:
                     case 9:
                     case 13:
-                        if (ran <= needed) vm.addDropBlock(new ItemStack(SAPLING, 1, (short) 1));
+                        if (needed >= 1 || ran <= needed) vm.addDropBlock(new ItemStack(SAPLING, 1, (short) 1));
                         break;
                     case 2:
                     case 6:
                     case 10:
                     case 14:
-                        if (ran <= needed) vm.addDropBlock(new ItemStack(SAPLING, 1, (short) 2));
+                        if (needed >= 1 || ran <= needed) vm.addDropBlock(new ItemStack(SAPLING, 1, (short) 2));
                         break;
                     case 3:
                     case 7:
                     case 11:
                     case 15:
-                        switch (vm.getLuckLevel()) {
+                        //Jungle Sapling
+                        needed = Math.pow((0.190825 / 3) * vm.getLuckLevel(), 3) + Math.pow(-0.1905 * vm.getLuckLevel(), 2) + (0.389075 / 3) * vm.getLuckLevel() + 0.025;
+
+                        if (needed >= 1 || ran <= needed) vm.addDropBlock(new ItemStack(SAPLING, 1, (short) 3));
+
+                        /*switch (vm.getLuckLevel()) {
                             case 0:
                                 if (ran <= 0.025) vm.addDropBlock(new ItemStack(SAPLING, 1, (short) 3));
                                 break;
@@ -330,7 +337,7 @@ public class Mining implements Listener {
                                 break;
                             case 3:
                                 if (ran <= 0.0417) vm.addDropBlock(new ItemStack(SAPLING, 1, (short) 3));
-                        }
+                        }*/
                         break;
                 }
             } else if (bl.getType().equals(LEAVES)) {
@@ -339,13 +346,13 @@ public class Mining implements Listener {
                     case 4:
                     case 8:
                     case 12:
-                        if (ran <= needed) vm.addDropBlock(new ItemStack(SAPLING, 1, (short) 4));
+                        if (needed >= 1 || ran <= needed) vm.addDropBlock(new ItemStack(SAPLING, 1, (short) 4));
                         break;
                     case 1:
                     case 5:
                     case 9:
                     case 13:
-                        if (ran <= needed) vm.addDropBlock(new ItemStack(SAPLING, 1, (short) 5));
+                        if (needed >= 1 || ran <= needed) vm.addDropBlock(new ItemStack(SAPLING, 1, (short) 5));
                         break;
                 }
             }
