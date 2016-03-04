@@ -246,6 +246,8 @@ public class Mining implements Listener {
 
             ItemStack iS = new ItemStack(GRAVEL, 1);
 
+            //Formel: 0.095 x^3 - 0.25 x^2 + 0.195 x + 0.1
+
             switch (vm.getLuckLevel()) {
                 case 0:
                     if (ran <= 0.1) iS = new ItemStack(FLINT, 1);
@@ -266,9 +268,11 @@ public class Mining implements Listener {
 
             if ((bl.getType().equals(LEAVES) && (bl.getData() == 0 || bl.getData() == 4 || bl.getData() == 8 || bl.getData() == 12)) ||
                     (bl.getType().equals(LEAVES_2) && (bl.getData() == 1 || bl.getData() == 5 || bl.getData() == 9 || bl.getData() == 13))) {
-                double apple
+                double appleNeeded = Math.pow(0.00021 * vm.getLuckLevel(), 3) + Math.pow(0.000565 * vm.getLuckLevel(), 2) + 0.000915 * vm.getLuckLevel() + 0.005;
 
-                switch (vm.getLuckLevel()) {
+                if (appleNeeded >= 1 || ran <= appleNeeded) vm.addDropBlock(new ItemStack(APPLE, 1));
+
+                /*switch (vm.getLuckLevel()) {
                     case 0:
                         if (ran <= 0.005) vm.addDropBlock(new ItemStack(APPLE, 1));
                         break;
@@ -280,7 +284,7 @@ public class Mining implements Listener {
                         break;
                     case 3:
                         if (ran <= 0.00833) vm.addDropBlock(new ItemStack(APPLE, 1));
-                }
+                }*/
                 ran = random.nextDouble();
             }
 
