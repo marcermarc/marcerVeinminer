@@ -161,8 +161,8 @@ public class Mining implements Listener {
 
             int newAmount = itemStacks.get(0).getAmount();
 
-            for (int i = vm.getLuckLevel(); i >1 ; i++) {
-                if (ran <= (1 / vm.getLuckLevel()) * i) {
+            for (int i = 1; i <= vm.getLuckLevel(); i++) {
+                if (ran <= ((double) i / (double) vm.getLuckLevel())) {
                     newAmount *= i + 1;
                     break;
                 }
