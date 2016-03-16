@@ -1,6 +1,6 @@
-package de.marcermarc.veinminer.controller;
+package de.marcermarc.lock.controller;
 
-import de.marcermarc.veinminer.objects.MaterialType;
+import de.marcermarc.lock.objects.MaterialType;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;

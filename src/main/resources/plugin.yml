@@ -1,7 +1,7 @@
 name: marcerVeinminer
 version: 0.4.1-BETA
 author: marcermarc
-main: de.marcermarc.veinminer.Main
+main: de.marcermarc.lock
 commands:
   marcerVeinminer:
     description: Zum Einstellen des Plugins

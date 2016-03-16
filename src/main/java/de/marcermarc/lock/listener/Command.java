@@ -1,7 +1,7 @@
-package de.marcermarc.veinminer.listener;
+package de.marcermarc.lock.listener;
 
-import de.marcermarc.veinminer.controller.PluginController;
-import de.marcermarc.veinminer.objects.MaterialType;
+import de.marcermarc.lock.controller.PluginController;
+import de.marcermarc.lock.objects.MaterialType;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.CommandExecutor;
