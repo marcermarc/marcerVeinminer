@@ -154,7 +154,7 @@ public class Mining implements Listener {
                 bl.getType().equals(DIAMOND_ORE) ||
                 bl.getType().equals(EMERALD_ORE) ||
                 bl.getType().equals(QUARTZ_ORE) ||
-                bl.getType().equals(LAPIS)) {
+                bl.getType().equals(LAPIS_ORE)) {
             ArrayList<ItemStack> itemStacks = (ArrayList) bl.getDrops();
 
             double ran = random.nextDouble();
@@ -162,7 +162,7 @@ public class Mining implements Listener {
             int newAmount = itemStacks.get(0).getAmount();
 
             for (int i = 1; i <= vm.getLuckLevel(); i++) {
-                if (ran <= ((double) i / (double) vm.getLuckLevel())) {
+                if (ran <= ((double) i / (double) vm.getLuckLevel() + 2)) {
                     newAmount *= i + 1;
                     break;
                 }
@@ -187,7 +187,7 @@ public class Mining implements Listener {
             vm.addRangeDropBlocks(itemStacks);
 
             if (bl.getType().equals(COAL_ORE)) {
-                vm.addDropExperiance(random.nextInt(3));
+                vm.addDropExperiance(random.nextInt(2));
             } else if (bl.getType().equals(DIAMOND_ORE) ||
                     bl.getType().equals(EMERALD_ORE)) {
                 vm.addDropExperiance(random.nextInt(5) + 3);
@@ -344,7 +344,7 @@ public class Mining implements Listener {
                         }*/
                         break;
                 }
-            } else if (bl.getType().equals(LEAVES)) {
+            } else if (bl.getType().equals(LEAVES_2)) {
                 switch (bl.getData()) {
                     case 0:
                     case 4:
