@@ -64,7 +64,7 @@ public class Mining implements Listener {
                 veinminer(bl, vm);
 
                 for (ItemStack d : vm.getDropBlocks()) {
-                    event.getPlayer().getWorld().dropItem(bl.getLocation(), d);
+                    event.getPlayer().getWorld().dropItem(bl.getLocation().add(0, 1, 0), d);
                 }
 
                 if (vm.getDropExperiance() != 0) {
