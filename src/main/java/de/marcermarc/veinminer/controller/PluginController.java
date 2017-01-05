@@ -1,6 +1,6 @@
-package de.marcermarc.lock.controller;
+package de.marcermarc.veinminer.controller;
 
-import de.marcermarc.lock.Main;
+import de.marcermarc.veinminer.Main;
 
 public class PluginController {
     private ConfigController config;

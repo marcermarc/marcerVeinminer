@@ -1,4 +1,4 @@
-package de.marcermarc.lock.objects;
+package de.marcermarc.veinminer.objects;
 
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;

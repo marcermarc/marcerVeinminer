@@ -1,9 +1,9 @@
-package de.marcermarc.lock.listener;
+package de.marcermarc.veinminer.listener;
 
 
-import de.marcermarc.lock.controller.PluginController;
-import de.marcermarc.lock.objects.MaterialType;
-import de.marcermarc.lock.objects.VeinminerMining;
+import de.marcermarc.veinminer.controller.PluginController;
+import de.marcermarc.veinminer.objects.MaterialType;
+import de.marcermarc.veinminer.objects.VeinminerMining;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -23,7 +23,6 @@ import java.util.Random;
 import static org.bukkit.Material.*;
 
 public class Mining implements Listener {
-
 
     private final short AREA[][] = {
             {-1, -1, -1}, {0, -1, -1}, {1, -1, -1},

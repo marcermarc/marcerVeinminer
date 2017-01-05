@@ -1,9 +1,9 @@
-package de.marcermarc.lock;
+package de.marcermarc.veinminer;
 
-import de.marcermarc.lock.controller.ConfigController;
-import de.marcermarc.lock.controller.PluginController;
-import de.marcermarc.lock.listener.Command;
-import de.marcermarc.lock.listener.Mining;
+import de.marcermarc.veinminer.controller.ConfigController;
+import de.marcermarc.veinminer.controller.PluginController;
+import de.marcermarc.veinminer.listener.Command;
+import de.marcermarc.veinminer.listener.Mining;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
