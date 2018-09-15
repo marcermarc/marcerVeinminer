@@ -26,12 +26,16 @@ public class Main extends JavaPlugin {
         in_PM.registerEvents(new Mining(controller), this);
 
         Command c = new Command(controller);
+        in_PM.registerEvents(c, this);
+
         this.getCommand("marcerVeinminer").setExecutor(c);
         this.getCommand("mV").setExecutor(c);
+        this.getCommand("marcerVeinminer").setTabCompleter(c);
+        this.getCommand("mV").setTabCompleter(c);
     }
 
     @Override
     public void onDisable() {
-        controller.getConfig().saveBlocks();
+        controller.getConfig().saveConfig();
     }
 }

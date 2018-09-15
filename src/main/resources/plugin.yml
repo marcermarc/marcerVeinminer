@@ -1,11 +1,12 @@
 name: marcerVeinminer
-version: 0.4.1-BETA
+version: 0.5.0-BETA
 author: marcermarc
 main: de.marcermarc.veinminer.Main
+api-version: 1.13
 commands:
   marcerVeinminer:
     description: Zum Einstellen des Plugins
-    usage: /marcerVeinminer [loadBlocks, saveBlocks, enable, disable, lists <tool> <block>]
+    #usage: /marcerVeinminer [loadBlocks, saveBlocks, enable, disable, lists <tool> <block>]
   mV:
     description: Zum Einstellen des Plugins
-    usage: /mV [loadBlocks, saveBlocks, enable, disable, lists [add, remove] <tool> <block>]
+    #usage: /mV [loadBlocks, saveBlocks, enable, disable, lists [add, remove] <tool> <block>]

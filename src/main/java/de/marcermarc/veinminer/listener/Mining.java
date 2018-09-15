@@ -2,22 +2,22 @@ package de.marcermarc.veinminer.listener;
 
 
 import de.marcermarc.veinminer.controller.PluginController;
-import de.marcermarc.veinminer.objects.MaterialType;
+import de.marcermarc.veinminer.objects.Tool;
 import de.marcermarc.veinminer.objects.VeinminerMining;
-import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.Ageable;
 import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.Dye;
+import org.bukkit.inventory.meta.Damageable;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Random;
 
 import static org.bukkit.Material.*;
@@ -30,14 +30,13 @@ public class Mining implements Listener {
             {-1, -1, 1}, {0, -1, 1}, {1, -1, 1},
 
             {-1, 0, -1}, {0, 0, -1}, {1, 0, -1},
-            {-1, 0, 0}, {1, 0, 0}, // {0,0,0} nicht, eigene Position nicht prüfen
+            {-1, 0, 0}, {1, 0, 0}, // {0,0,0} not try to inspect own position a second time
             {-1, 0, 1}, {0, 0, 1}, {1, 0, 1},
 
             {-1, 1, -1}, {0, 1, -1}, {1, 1, -1},
             {-1, 1, 0}, {0, 1, 0}, {1, 1, 0},
             {-1, 1, 1}, {0, 1, 1}, {1, 1, 1},
     };
-    private final static Material LAPIS = new Dye(DyeColor.BLUE).getItemType();
 
     private PluginController controller;
     private Random random;
@@ -53,12 +52,12 @@ public class Mining implements Listener {
         if (controller.getConfig().getEnabledPlayers().contains(event.getPlayer()) && event.getPlayer().isSneaking()) {
 
             Block bl = event.getBlock();
-            ItemStack item = event.getPlayer().getItemInHand();
-            List<MaterialType> veinMinerMaterials = getVeinMinerList(item);
+            ItemStack item = event.getPlayer().getInventory().getItemInMainHand();
+            HashSet<Material> veinMinerMaterials = getVeinMinerList(item);
 
-            if (veinMinerMaterials != null && veinMinerMaterials.contains(new MaterialType(bl.getType(), bl.getData())) && canBreak(item, bl)) {
+            if (veinMinerMaterials != null && veinMinerMaterials.contains(bl.getType()) && canBreak(item, bl)) {
 
-                VeinminerMining vm = new VeinminerMining(new MaterialType(bl.getType(), bl.getData()), item);
+                VeinminerMining vm = new VeinminerMining(bl.getType(), item);
 
                 veinminer(bl, vm);
 
@@ -71,30 +70,29 @@ public class Mining implements Listener {
                 }
 
                 if (item.getDurability() >= item.getType().getMaxDurability()) {
-                    event.getPlayer().setItemInHand(new ItemStack(AIR));
-                    event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.ITEM_BREAK, 1.0f, 1.0f); // optional
+                    event.getPlayer().getInventory().setItemInMainHand(new ItemStack(AIR));
+                    event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0f, 1.0f); // optional
                 } else {
-                    event.getPlayer().setItemInHand(item);
+                    event.getPlayer().getInventory().setItemInMainHand(item);
                 }
             }
         }
     }
 
     private boolean canBreak(ItemStack item, Block bl) {
-        switch (item.getTypeId()) {
-            case (270): //Material.WOOD_PICKAXE
+        switch (item.getType()) {
+            case WOODEN_PICKAXE:
                 if (bl.getType().equals(Material.IRON_ORE) ||
                         bl.getType().equals(Material.LAPIS_ORE))
                     return false;
-            case (274): //Material.STONE_PICKAXE
+            case STONE_PICKAXE:
                 if (bl.getType().equals(Material.DIAMOND_ORE) ||
                         bl.getType().equals(Material.GOLD_ORE) ||
-                        bl.getType().equals(Material.REDSTONE_ORE) ||
-                        bl.getType().equals(Material.GLOWING_REDSTONE_ORE))
+                        bl.getType().equals(Material.REDSTONE_ORE))
                     return false;
 
-            case (257): //Material.IRON_PICKAXE
-            case (285): //Material.GOLD_PICKAXE
+            case IRON_PICKAXE:
+            case GOLDEN_PICKAXE:
                 if (bl.getType().equals(Material.OBSIDIAN))
                     return false;
                 break;
@@ -103,36 +101,30 @@ public class Mining implements Listener {
 
     }
 
-    private List<MaterialType> getVeinMinerList(ItemStack item) {
-        if (item.getType().name().contains("_PICKAXE")) {
-            return controller.getConfig().getPickaxe();
-        } else if (item.getType().name().contains("_AXE")) {
-            return controller.getConfig().getAxe();
-        } else if (item.getType().name().contains("_SPADE")) {
-            return controller.getConfig().getSpade();
-        } else if (item.getType().name().contains("_HOE")) {
-            return controller.getConfig().getHoe();
-        } else if (item.getType().name().contains("_SWORD")) {
-            return controller.getConfig().getSword();
-        } else if (item.getType().name().equals("_SHEARS")) {
-            return controller.getConfig().getShears();
-        } else {
-            return null;
+    private HashSet<Material> getVeinMinerList(ItemStack item) {
+        Tool tool = Tool.getByTool(item.getType());
+
+        if (tool != null) {
+            return tool.getVeinminerMaterials();
         }
+
+        return null;
     }
 
     private void veinminer(Block bl, VeinminerMining vm) {
         if (vm.isSilktouch()) {
-            vm.addDropBlock(new ItemStack(bl.getType(), 1, bl.getData()));
+            vm.addDropBlock(new ItemStack(bl.getType(), 1));
         } else {
             getDrops(bl, vm);
         }
 
         bl.setType(AIR);
 
+        Damageable itemMeta = (Damageable) vm.getHoldItem().getItemMeta();
+
         if (vm.getUnbreaking() != -1 && random.nextDouble() <= (1.0 / (vm.getUnbreaking() + 1.0))) {
-            vm.getHoldItem().setDurability((short) (vm.getHoldItem().getDurability() + 1));
-            if (vm.getHoldItem().getDurability() > vm.getHoldItem().getType().getMaxDurability())
+            itemMeta.setDamage((itemMeta.getDamage() + 1));
+            if (itemMeta.getDamage() > vm.getHoldItem().getType().getMaxDurability())
                 vm.getHoldItem().setType(AIR);
         }
 
@@ -142,225 +134,191 @@ public class Mining implements Listener {
 
             Block b = bl.getWorld().getBlockAt(bl.getX() + a[0], bl.getY() + a[1], bl.getZ() + a[2]);
 
-            if (vm.getType().equals(new MaterialType(b.getType(), b.getData()))) {
+            if (vm.getType() == b.getType()) {
                 veinminer(b, vm);
             }
         }
     }
 
     private void getDrops(Block bl, VeinminerMining vm) {
-        if (bl.getType().equals(COAL_ORE) ||
-                bl.getType().equals(DIAMOND_ORE) ||
-                bl.getType().equals(EMERALD_ORE) ||
-                bl.getType().equals(QUARTZ_ORE) ||
-                bl.getType().equals(LAPIS_ORE)) {
-            ArrayList<ItemStack> itemStacks = (ArrayList) bl.getDrops();
+        switch (bl.getType()) {
+            case COAL_ORE:
+            case DIAMOND_ORE:
+            case EMERALD_ORE:
+            case NETHER_QUARTZ_ORE:
+            case LAPIS_ORE:
 
-            double ran = random.nextDouble();
+                Collection<ItemStack> itemStacksOre = bl.getDrops();
 
-            int newAmount = itemStacks.get(0).getAmount();
+                double ranOres = random.nextDouble();
 
-            for (int i = 1; i <= vm.getLuckLevel(); i++) {
-                if (ran <= ((double) i / (double) vm.getLuckLevel() + 2)) {
-                    newAmount *= i + 1;
-                    break;
+                for (ItemStack is : itemStacksOre) {
+                    int newAmount = is.getAmount();
+
+                    for (int i = 1; i <= vm.getLuckLevel(); i++) {
+                        if (ranOres <= ((double) i / (double) vm.getLuckLevel() + 2)) {
+                            newAmount *= i + 1;
+                            break;
+                        }
+                    }
+
+                    is.setAmount(newAmount);
                 }
-            }
 
-            /*switch (luckLevel) {
-                case 1:
-                    if (ran <= 0.33) newAmount *= 2;
-                    break;
-                case 2:
-                    if (ran <= 0.25) newAmount *= 2;
-                    else if (ran <= 0.50) newAmount *= 3;
-                    break;
-                case 3:
-                    if (ran <= 0.20) newAmount *= 2;
-                    else if (ran <= 0.40) newAmount *= 3;
-                    else if (ran <= 0.60) newAmount *= 4;
-                    break;
-            }*/
-            itemStacks.get(0).setAmount(newAmount);
+                vm.addRangeDropBlocks(itemStacksOre);
 
-            vm.addRangeDropBlocks(itemStacks);
+                switch (bl.getType()) {
+                    case COAL_ORE:
+                        vm.addDropExperiance(random.nextInt(2));
+                        break;
+                    case DIAMOND_ORE:
+                    case EMERALD_ORE:
+                        vm.addDropExperiance(random.nextInt(5) + 3);
+                        break;
+                    case NETHER_QUARTZ_ORE:
+                    case LAPIS_ORE:
+                        vm.addDropExperiance(random.nextInt(4) + 2);
+                        break;
+                }
+                break;
 
-            if (bl.getType().equals(COAL_ORE)) {
-                vm.addDropExperiance(random.nextInt(2));
-            } else if (bl.getType().equals(DIAMOND_ORE) ||
-                    bl.getType().equals(EMERALD_ORE)) {
-                vm.addDropExperiance(random.nextInt(5) + 3);
-            } else if (bl.getType().equals(QUARTZ_ORE) ||
-                    bl.getType().equals(LAPIS)) {
-                vm.addDropExperiance(random.nextInt(4) + 2);
-            }
+            case REDSTONE_ORE:
+                vm.addDropBlock(new ItemStack(REDSTONE, random.nextInt(1 + vm.getLuckLevel()) + 4));
+                vm.addDropExperiance(random.nextInt(5) + 1);
+                break;
 
-        } else if (bl.getType().equals(REDSTONE_ORE)) {
+            case CARROTS:
+                Ageable dataCarrot = (Ageable) bl.getBlockData();
 
-            vm.addDropBlock(new ItemStack(REDSTONE, random.nextInt(1 + vm.getLuckLevel()) + 4));
-            vm.addDropExperiance(random.nextInt(5) + 1);
+                if (dataCarrot.getAge() == dataCarrot.getMaximumAge()) {
+                    vm.addDropBlock(new ItemStack(CARROT, random.nextInt(3 + vm.getLuckLevel()) + 1));
+                }
+                break;
 
-        } else if (bl.getType().equals(CARROT) && bl.getData() == 7) {
+            case GLOWSTONE:
+                int amountGlowstone = random.nextInt(2 + vm.getLuckLevel()) + 2;
+                vm.addDropBlock(new ItemStack(GLOWSTONE_DUST, amountGlowstone > 4 ? 4 : amountGlowstone));
+                break;
 
-            vm.addDropBlock(new ItemStack(CARROT_ITEM, random.nextInt(3 + vm.getLuckLevel()) + 1));
+            case SEA_LANTERN:
+                int amountSealatern = random.nextInt(1 + vm.getLuckLevel()) + 2;
+                vm.addDropBlock(new ItemStack(PRISMARINE_CRYSTALS, amountSealatern > 5 ? 5 : amountSealatern));
+                break;
 
-        } else if (bl.getType().equals(GLOWSTONE)) {
+            case MELON:
+                int amountMelon = random.nextInt(4 + vm.getLuckLevel()) + 3;
+                vm.addDropBlock(new ItemStack(MELON_SLICE, amountMelon > 9 ? 9 : amountMelon));
+                break;
 
-            int amount = random.nextInt(2 + vm.getLuckLevel()) + 2;
-            vm.addDropBlock(new ItemStack(GLOWSTONE_DUST, amount > 4 ? 4 : amount));
+            case NETHER_WART:
+                vm.addDropBlock(new ItemStack(NETHER_WART, random.nextInt(2 + vm.getLuckLevel()) + 2));
+                break;
 
-        } else if (bl.getType().equals(SEA_LANTERN)) {
+            case POTATOES:
+                Ageable dataPotato = (Ageable) bl.getBlockData();
 
-            int amount = random.nextInt(1 + vm.getLuckLevel()) + 2;
-            vm.addDropBlock(new ItemStack(PRISMARINE_CRYSTALS, amount > 5 ? 5 : amount));
+                if (dataPotato.getAge() == dataPotato.getMaximumAge()) {
+                    vm.addDropBlock(new ItemStack(POTATO, random.nextInt(3 + vm.getLuckLevel()) + 1));
+                }
+                break;
 
-        } else if (bl.getType().equals(MELON_BLOCK)) {
+            case WHEAT:
+                Ageable dataWheat = (Ageable) bl.getBlockData();
 
-            int amount = random.nextInt(4 + vm.getLuckLevel()) + 3;
-            vm.addDropBlock(new ItemStack(MELON, amount > 9 ? 9 : amount));
+                if (dataWheat.getAge() == dataWheat.getMaximumAge()) {
+                    vm.addDropBlock(new ItemStack(WHEAT_SEEDS, random.nextInt(3 + vm.getLuckLevel())));
+                    vm.addDropBlock(new ItemStack(WHEAT, 1));
+                }
+                break;
 
-        } else if (bl.getType().equals(NETHER_WARTS)) {
+            case BEETROOTS:
+                Ageable dataBeetroot = (Ageable) bl.getBlockData();
 
-            vm.addDropBlock(new ItemStack(NETHER_WARTS, random.nextInt(2 + vm.getLuckLevel()) + 2));
+                if (dataBeetroot.getAge() == dataBeetroot.getMaximumAge()) {
+                    vm.addDropBlock(new ItemStack(BEETROOT_SEEDS, random.nextInt(3 + vm.getLuckLevel())));
+                    vm.addDropBlock(new ItemStack(BEETROOT, 1));
+                }
+                break;
 
-        } else if (bl.getType().equals(POTATO) && bl.getData() == 7) {
+            case TALL_GRASS:
+                Collection<ItemStack> itemStacksGrass = bl.getDrops();
 
-            vm.addDropBlock(new ItemStack(POTATO_ITEM, random.nextInt(3 + vm.getLuckLevel()) + 1));
+                double ranGrass = random.nextDouble();
 
-        } else if (bl.getType().equals(CROPS) && bl.getData() == 7) {
+                for (ItemStack is : itemStacksGrass) {
+                    int newAmount = is.getAmount();
 
-            vm.addDropBlock(new ItemStack(SEEDS, random.nextInt(3 + vm.getLuckLevel())));
-            vm.addDropBlock(new ItemStack(WHEAT, 1));
+                    for (int i = 1; i <= vm.getLuckLevel(); i++) {
+                        if (ranGrass <= ((double) i / (double) vm.getLuckLevel() + 2)) {
+                            newAmount *= i + 1;
+                            break;
+                        }
+                    }
 
-        } else if (bl.getType().equals(GRASS)) {
+                    is.setAmount(newAmount);
+                }
+                vm.addRangeDropBlocks(itemStacksGrass);
+                break;
 
-            ArrayList<ItemStack> itemStacks = (ArrayList) bl.getDrops();
-            if (itemStacks.size() >= 1) {
-                itemStacks.get(0).setAmount(random.nextInt(vm.getLuckLevel() * 2) + 1);
-            }
-            vm.addRangeDropBlocks(itemStacks);
+            case GRAVEL:
 
-        } else if (bl.getType().equals(GRAVEL)) {
-            double ran = random.nextDouble();
+                double ranGravel = random.nextDouble();
 
-            ItemStack iS = new ItemStack(GRAVEL, 1);
+                ItemStack isGravel = new ItemStack(GRAVEL, 1);
+                //Formel: 0.095 x^3 - 0.25 x^2 + 0.195 x + 0.1 not needed because at 3 or more ist every time flint
 
-            //Formel: 0.095 x^3 - 0.25 x^2 + 0.195 x + 0.1
-
-            switch (vm.getLuckLevel()) {
-                case 0:
-                    if (ran <= 0.1) iS = new ItemStack(FLINT, 1);
-                    break;
-                case 1:
-                    if (ran <= 0.14) iS = new ItemStack(FLINT, 1);
-                    break;
-                case 2:
-                    if (ran <= 0.25) iS = new ItemStack(FLINT, 1);
-                    break;
-                default:
-                    iS = new ItemStack(FLINT, 1);
-            }
-            vm.addDropBlock(iS);
-
-        } else if (bl.getType().equals(LEAVES) || bl.getType().equals(LEAVES_2)) {
-            double ran = random.nextDouble();
-
-            if ((bl.getType().equals(LEAVES) && (bl.getData() == 0 || bl.getData() == 4 || bl.getData() == 8 || bl.getData() == 12)) ||
-                    (bl.getType().equals(LEAVES_2) && (bl.getData() == 1 || bl.getData() == 5 || bl.getData() == 9 || bl.getData() == 13))) {
-                double appleNeeded = Math.pow(0.00021 * vm.getLuckLevel(), 3) + Math.pow(0.000565 * vm.getLuckLevel(), 2) + 0.000915 * vm.getLuckLevel() + 0.005;
-
-                if (appleNeeded >= 1 || ran <= appleNeeded) vm.addDropBlock(new ItemStack(APPLE, 1));
-
-                /*switch (vm.getLuckLevel()) {
+                switch (vm.getLuckLevel()) {
                     case 0:
-                        if (ran <= 0.005) vm.addDropBlock(new ItemStack(APPLE, 1));
+                        if (ranGravel <= 0.1) isGravel = new ItemStack(FLINT, 1);
                         break;
                     case 1:
-                        if (ran <= 0.00556) vm.addDropBlock(new ItemStack(APPLE, 1));
+                        if (ranGravel <= 0.14) isGravel = new ItemStack(FLINT, 1);
                         break;
                     case 2:
-                        if (ran <= 0.00625) vm.addDropBlock(new ItemStack(APPLE, 1));
+                        if (ranGravel <= 0.25) isGravel = new ItemStack(FLINT, 1);
                         break;
-                    case 3:
-                        if (ran <= 0.00833) vm.addDropBlock(new ItemStack(APPLE, 1));
-                }*/
-                ran = random.nextDouble();
-            }
-
-            double needed = Math.pow((0.0062 / 3) * vm.getLuckLevel(), 3) + Math.pow(0.01035 * vm.getLuckLevel(), 2) + (0.01265 / 3) * vm.getLuckLevel() + 0.05;
-            /*switch (vm.getLuckLevel()) {
-                case 1:
-                    needed = 0.0625;
-                    break;
-                case 2:
-                    needed = 0.0833;
-                    break;
-                case 3:
-                    needed = 0.1;
-            }*/
-
-            if (bl.getType().equals(LEAVES)) {
-                switch (bl.getData()) {
-                    case 0:
-                    case 4:
-                    case 8:
-                    case 12:
-                        if (needed >= 1 || ran <= needed) vm.addDropBlock(new ItemStack(SAPLING, 1, (short) 0));
-                        break;
-                    case 1:
-                    case 5:
-                    case 9:
-                    case 13:
-                        if (needed >= 1 || ran <= needed) vm.addDropBlock(new ItemStack(SAPLING, 1, (short) 1));
-                        break;
-                    case 2:
-                    case 6:
-                    case 10:
-                    case 14:
-                        if (needed >= 1 || ran <= needed) vm.addDropBlock(new ItemStack(SAPLING, 1, (short) 2));
-                        break;
-                    case 3:
-                    case 7:
-                    case 11:
-                    case 15:
-                        //Jungle Sapling
-                        needed = Math.pow((0.190825 / 3) * vm.getLuckLevel(), 3) + Math.pow(-0.1905 * vm.getLuckLevel(), 2) + (0.389075 / 3) * vm.getLuckLevel() + 0.025;
-
-                        if (needed >= 1 || ran <= needed) vm.addDropBlock(new ItemStack(SAPLING, 1, (short) 3));
-
-                        /*switch (vm.getLuckLevel()) {
-                            case 0:
-                                if (ran <= 0.025) vm.addDropBlock(new ItemStack(SAPLING, 1, (short) 3));
-                                break;
-                            case 1:
-                                if (ran <= 0.0278) vm.addDropBlock(new ItemStack(SAPLING, 1, (short) 3));
-                                break;
-                            case 2:
-                                if (ran <= 0.03125) vm.addDropBlock(new ItemStack(SAPLING, 1, (short) 3));
-                                break;
-                            case 3:
-                                if (ran <= 0.0417) vm.addDropBlock(new ItemStack(SAPLING, 1, (short) 3));
-                        }*/
-                        break;
+                    default:
+                        isGravel = new ItemStack(FLINT, 1);
                 }
-            } else if (bl.getType().equals(LEAVES_2)) {
-                switch (bl.getData()) {
-                    case 0:
-                    case 4:
-                    case 8:
-                    case 12:
-                        if (needed >= 1 || ran <= needed) vm.addDropBlock(new ItemStack(SAPLING, 1, (short) 4));
-                        break;
-                    case 1:
-                    case 5:
-                    case 9:
-                    case 13:
-                        if (needed >= 1 || ran <= needed) vm.addDropBlock(new ItemStack(SAPLING, 1, (short) 5));
-                        break;
+                vm.addDropBlock(isGravel);
+                break;
+
+            case OAK_LEAVES:
+            case DARK_OAK_LEAVES:
+                double neededApple = Math.pow(0.00021 * vm.getLuckLevel(), 3) + Math.pow(0.000565 * vm.getLuckLevel(), 2) + 0.000915 * vm.getLuckLevel() + 0.005;
+                if (neededApple >= 1 || random.nextDouble() <= neededApple) vm.addDropBlock(new ItemStack(APPLE, 1));
+            case ACACIA_LEAVES:
+            case BIRCH_LEAVES:
+            case SPRUCE_LEAVES:
+                double neededSapling = Math.pow((0.0062 / 3) * vm.getLuckLevel(), 3) + Math.pow(0.01035 * vm.getLuckLevel(), 2) + (0.01265 / 3) * vm.getLuckLevel() + 0.05;
+                if (neededSapling >= 1 || random.nextDouble() <= neededSapling) {
+                    switch (bl.getType()) {
+                        case OAK_LEAVES:
+                            vm.addDropBlock(new ItemStack(OAK_SAPLING));
+                            break;
+                        case DARK_OAK_LEAVES:
+                            vm.addDropBlock(new ItemStack(DARK_OAK_SAPLING));
+                            break;
+                        case ACACIA_LEAVES:
+                            vm.addDropBlock(new ItemStack(ACACIA_SAPLING));
+                            break;
+                        case BIRCH_LEAVES:
+                            vm.addDropBlock(new ItemStack(BIRCH_SAPLING));
+                            break;
+                        case SPRUCE_LEAVES:
+                            vm.addDropBlock(new ItemStack(SPRUCE_SAPLING));
+                            break;
+                    }
                 }
-            }
-        } else {
-            vm.addRangeDropBlocks(bl.getDrops());
+                break;
+
+            case JUNGLE_LEAVES:
+                double neededJungleSapling = Math.pow((0.190825 / 3) * vm.getLuckLevel(), 3) + Math.pow(-0.1905 * vm.getLuckLevel(), 2) + (0.389075 / 3) * vm.getLuckLevel() + 0.025;
+                if (neededJungleSapling >= 1 || random.nextDouble() <= neededJungleSapling) vm.addDropBlock(new ItemStack(JUNGLE_SAPLING, 1));
+                break;
+
+            default:
+                vm.addRangeDropBlocks(bl.getDrops());
         }
 
         // http://minecraft.gamepedia.com/Enchanting#Fortune

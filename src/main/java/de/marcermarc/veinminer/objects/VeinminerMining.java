@@ -1,5 +1,6 @@
 package de.marcermarc.veinminer.objects;
 
+import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 
@@ -19,11 +20,11 @@ public class VeinminerMining {
     private int unbreaking;
 
     //other
-    private MaterialType type;
+    private Material type;
     private ItemStack holdItem;
     //private Location location;
 
-    public VeinminerMining(MaterialType type, ItemStack holdItem) {
+    public VeinminerMining(Material type, ItemStack holdItem) {
         this.type = type;
         this.holdItem = holdItem;
         //this.location = location;
@@ -32,11 +33,15 @@ public class VeinminerMining {
         this.dropExperiance = 0;
 
         //silktouck
-        if (holdItem.getType().equals(SHEARS) && (
-                type.getMaterial().equals(GRASS) ||
-                        type.getMaterial().equals(LONG_GRASS) ||
-                        type.getMaterial().equals(LEAVES) ||
-                        type.getMaterial().equals(LEAVES_2)
+        if (holdItem.getType().equals(SHEARS)
+                && (type == GRASS
+                || type == TALL_GRASS
+                || type == OAK_LEAVES
+                || type == JUNGLE_LEAVES
+                || type == DARK_OAK_LEAVES
+                || type == BIRCH_LEAVES
+                || type == SPRUCE_LEAVES
+                || type == ACACIA_LEAVES
         )) {
             this.silkTouch = true; //for shears true, because of the other drops
         } else {
@@ -44,26 +49,29 @@ public class VeinminerMining {
         }
 
         //luck
-        if ((holdItem.containsEnchantment(Enchantment.LOOT_BONUS_BLOCKS) ||
-                holdItem.containsEnchantment(Enchantment.LOOT_BONUS_MOBS)
-        ) && (
-                type.getMaterial().equals(COAL_ORE) ||
-                        type.getMaterial().equals(DIAMOND_ORE) ||
-                        type.getMaterial().equals(REDSTONE_ORE) ||
-                        type.getMaterial().equals(LAPIS_ORE) ||
-                        type.getMaterial().equals(QUARTZ_ORE) ||
-                        type.getMaterial().equals(POTATO) ||
-                        type.getMaterial().equals(CARROT) ||
-                        type.getMaterial().equals(WHEAT) ||
-                        type.getMaterial().equals(GRASS) ||
-                        type.getMaterial().equals(EMERALD_ORE) ||
-                        type.getMaterial().equals(GLOWSTONE) ||
-                        type.getMaterial().equals(MELON_BLOCK) ||
-                        type.getMaterial().equals(NETHER_WARTS) ||
-                        type.getMaterial().equals(GRAVEL) ||
-                        type.getMaterial().equals(LEAVES) ||
-                        type.getMaterial().equals(LEAVES_2)
-        )) {
+        if ((holdItem.containsEnchantment(Enchantment.LOOT_BONUS_BLOCKS)
+                || holdItem.containsEnchantment(Enchantment.LOOT_BONUS_MOBS))
+                && (type == COAL_ORE
+                || type == DIAMOND_ORE
+                || type == REDSTONE_ORE
+                || type == LAPIS_ORE
+                || type == NETHER_QUARTZ_ORE
+                || type == POTATO
+                || type == CARROT
+                || type == WHEAT
+                || type == GRASS
+                || type == EMERALD_ORE
+                || type == GLOWSTONE
+                || type == MELON
+                || type == NETHER_WART
+                || type == GRAVEL
+                || type == OAK_LEAVES
+                || type == JUNGLE_LEAVES
+                || type == DARK_OAK_LEAVES
+                || type == BIRCH_LEAVES
+                || type == SPRUCE_LEAVES
+                || type == ACACIA_LEAVES)
+        ) {
             if (holdItem.containsEnchantment(Enchantment.LOOT_BONUS_BLOCKS)) {
                 this.luckLevel = holdItem.getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS);
             } else if (holdItem.containsEnchantment(Enchantment.LOOT_BONUS_MOBS)) {
@@ -74,7 +82,7 @@ public class VeinminerMining {
         }
 
         //unbreaking
-        if (holdItem.getType().equals(WOOD_HOE) || holdItem.getType().equals(STONE_HOE) || holdItem.getType().equals(IRON_HOE) || holdItem.getType().equals(GOLD_HOE) || holdItem.getType().equals(DIAMOND_HOE)) {
+        if (holdItem.getType().equals(WOODEN_HOE) || holdItem.getType().equals(STONE_HOE) || holdItem.getType().equals(IRON_HOE) || holdItem.getType().equals(GOLDEN_HOE) || holdItem.getType().equals(DIAMOND_HOE)) {
             this.unbreaking = -1;
         } else if (holdItem.containsEnchantment(Enchantment.DURABILITY)) {
             this.unbreaking = holdItem.getEnchantmentLevel(Enchantment.DURABILITY);
@@ -86,7 +94,7 @@ public class VeinminerMining {
     public void addDropBlock(ItemStack drop) {
         boolean success = false;
         for (ItemStack itemS : this.dropBlocks) {
-            if (drop.getType().equals(itemS) && drop.getData() == itemS.getData()) {
+            if (drop.getType().equals(itemS.getType()) && drop.getData() == itemS.getData()) {
                 itemS.setAmount(itemS.getAmount() + drop.getAmount());
                 success = true;
                 break;
@@ -129,7 +137,7 @@ public class VeinminerMining {
         return unbreaking;
     }
 
-    public MaterialType getType() {
+    public Material getType() {
         return type;
     }
 
