@@ -6,7 +6,16 @@
 
     <groupId>de.marcermarc.veinminer</groupId>
     <artifactId>marcerVeinminer</artifactId>
-    <version>0.5.0-BETA</version>
+    <version>0.5.1-BETA</version>
+
+    <distributionManagement>
+        <repository>
+            <id>internal.repo</id>
+            <name>Temporary Staging Repository</name>
+            <url>file://${project.build.directory}/mvn-repo</url>
+        </repository>
+    </distributionManagement>
+
     <build>
         <plugins>
             <plugin>

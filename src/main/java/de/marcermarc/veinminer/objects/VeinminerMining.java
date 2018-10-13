@@ -49,34 +49,10 @@ public class VeinminerMining {
         }
 
         //luck
-        if ((holdItem.containsEnchantment(Enchantment.LOOT_BONUS_BLOCKS)
-                || holdItem.containsEnchantment(Enchantment.LOOT_BONUS_MOBS))
-                && (type == COAL_ORE
-                || type == DIAMOND_ORE
-                || type == REDSTONE_ORE
-                || type == LAPIS_ORE
-                || type == NETHER_QUARTZ_ORE
-                || type == POTATO
-                || type == CARROT
-                || type == WHEAT
-                || type == GRASS
-                || type == EMERALD_ORE
-                || type == GLOWSTONE
-                || type == MELON
-                || type == NETHER_WART
-                || type == GRAVEL
-                || type == OAK_LEAVES
-                || type == JUNGLE_LEAVES
-                || type == DARK_OAK_LEAVES
-                || type == BIRCH_LEAVES
-                || type == SPRUCE_LEAVES
-                || type == ACACIA_LEAVES)
-        ) {
-            if (holdItem.containsEnchantment(Enchantment.LOOT_BONUS_BLOCKS)) {
-                this.luckLevel = holdItem.getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS);
-            } else if (holdItem.containsEnchantment(Enchantment.LOOT_BONUS_MOBS)) {
-                this.luckLevel = holdItem.getEnchantmentLevel(Enchantment.LOOT_BONUS_MOBS);
-            }
+        if (holdItem.containsEnchantment(Enchantment.LOOT_BONUS_BLOCKS)) {
+            this.luckLevel = holdItem.getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS);
+        } else if (holdItem.containsEnchantment(Enchantment.LOOT_BONUS_MOBS)) {
+            this.luckLevel = holdItem.getEnchantmentLevel(Enchantment.LOOT_BONUS_MOBS);
         } else {
             this.luckLevel = 0;
         }
@@ -94,7 +70,7 @@ public class VeinminerMining {
     public void addDropBlock(ItemStack drop) {
         boolean success = false;
         for (ItemStack itemS : this.dropBlocks) {
-            if (drop.getType().equals(itemS.getType()) && drop.getData() == itemS.getData()) {
+            if (drop.getType() == itemS.getType() && drop.getData().equals(itemS.getData())) {
                 itemS.setAmount(itemS.getAmount() + drop.getAmount());
                 success = true;
                 break;
