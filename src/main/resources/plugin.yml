@@ -1,5 +1,5 @@
 name: marcerVeinminer
-version: 0.5.1-BETA
+version: 1.0.0
 author: marcermarc
 main: de.marcermarc.veinminer.Main
 api-version: 1.13
