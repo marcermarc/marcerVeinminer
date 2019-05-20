@@ -3,9 +3,11 @@ package de.marcermarc.veinminer.objects;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 
 import static org.bukkit.Material.*;
 
@@ -22,14 +24,16 @@ public class VeinminerMining {
     //other
     private Material type;
     private ItemStack holdItem;
+    private Damageable meta;
     //private Location location;
 
     public VeinminerMining(Material type, ItemStack holdItem) {
         this.type = type;
         this.holdItem = holdItem;
+        this.meta = (Damageable) holdItem.getItemMeta();
         //this.location = location;
 
-        this.dropBlocks = new ArrayList();
+        this.dropBlocks = new ArrayList<>();
         this.dropExperiance = 0;
 
         //silktouck
@@ -70,7 +74,7 @@ public class VeinminerMining {
     public void addDropBlock(ItemStack drop) {
         boolean success = false;
         for (ItemStack itemS : this.dropBlocks) {
-            if (drop.getType() == itemS.getType() && drop.getData().equals(itemS.getData())) {
+            if (drop.getType() == itemS.getType() && Objects.equals(drop.getData(), itemS.getData())) {
                 itemS.setAmount(itemS.getAmount() + drop.getAmount());
                 success = true;
                 break;
@@ -121,7 +125,10 @@ public class VeinminerMining {
         return holdItem;
     }
 
+    public Damageable getMeta() {
+        return meta;
+    }
 
-    //endregion
+//endregion
 
 }

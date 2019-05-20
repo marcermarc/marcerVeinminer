@@ -14,7 +14,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.Damageable;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -24,7 +24,7 @@ import static org.bukkit.Material.*;
 
 public class Mining implements Listener {
 
-    private final short AREA[][] = {
+    private final int[][] AREA = {
             {-1, -1, -1}, {0, -1, -1}, {1, -1, -1},
             {-1, -1, 0}, {0, -1, 0}, {1, -1, 0},
             {-1, -1, 1}, {0, -1, 1}, {1, -1, 1},
@@ -69,10 +69,11 @@ public class Mining implements Listener {
                     (event.getPlayer().getWorld().spawn(bl.getLocation(), ExperienceOrb.class)).setExperience(vm.getDropExperiance());
                 }
 
-                if (item.getDurability() >= item.getType().getMaxDurability()) {
+                if (vm.getMeta().getDamage() >= item.getType().getMaxDurability()) {
                     event.getPlayer().getInventory().setItemInMainHand(new ItemStack(AIR));
                     event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0f, 1.0f); // optional
                 } else {
+                    item.setItemMeta((ItemMeta) vm.getMeta());
                     event.getPlayer().getInventory().setItemInMainHand(item);
                 }
             }
@@ -120,15 +121,13 @@ public class Mining implements Listener {
 
         bl.setType(AIR);
 
-        Damageable itemMeta = (Damageable) vm.getHoldItem().getItemMeta();
-
         if (vm.getUnbreaking() != -1 && random.nextDouble() <= (1.0 / (vm.getUnbreaking() + 1.0))) {
-            itemMeta.setDamage((itemMeta.getDamage() + 1));
-            if (itemMeta.getDamage() > vm.getHoldItem().getType().getMaxDurability())
+            vm.getMeta().setDamage((vm.getMeta().getDamage() + 1));
+            if (vm.getMeta().getDamage() > vm.getHoldItem().getType().getMaxDurability())
                 vm.getHoldItem().setType(AIR);
         }
 
-        for (short[] a : AREA) {
+        for (int[] a : AREA) {
 
             if (vm.getHoldItem().getType().equals(AIR)) break;
 
@@ -321,8 +320,8 @@ public class Mining implements Listener {
                 vm.addRangeDropBlocks(bl.getDrops());
         }
 
-        // http://minecraft.gamepedia.com/Enchanting#Fortune
-        // http://minecraft-de.gamepedia.com/Verzauberung
+        // https://minecraft.gamepedia.com/Fortune
+        // https://minecraft-de.gamepedia.com/Verzauberung#Gl.C3.BCck
     }
 
 }

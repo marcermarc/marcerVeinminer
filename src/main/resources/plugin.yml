@@ -1,8 +1,7 @@
 name: marcerVeinminer
-version: 1.0.0
+version: 1.1.0
 author: marcermarc
 main: de.marcermarc.veinminer.Main
-api-version: 1.13
 commands:
   marcerVeinminer:
     description: Zum Einstellen des Plugins
