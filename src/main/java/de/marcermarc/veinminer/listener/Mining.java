@@ -239,6 +239,15 @@ public class Mining implements Listener {
                 }
                 break;
 
+            case SWEET_BERRY_BUSH:
+                Ageable dataBerryBush = (Ageable) bl.getBlockData();
+
+                if (dataBerryBush.getAge() == dataBerryBush.getMaximumAge()) {
+                    vm.addDropBlock(new ItemStack(SWEET_BERRIES, random.nextInt(1 + vm.getLuckLevel()) + 2));
+                } else if (dataBerryBush.getAge() == dataBerryBush.getMaximumAge() - 1) {
+                    vm.addDropBlock(new ItemStack(SWEET_BERRIES, random.nextInt(1 + vm.getLuckLevel()) + 1));
+                }
+
             case TALL_GRASS:
                 Collection<ItemStack> itemStacksGrass = bl.getDrops();
 
