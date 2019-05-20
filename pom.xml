@@ -6,7 +6,7 @@
 
     <groupId>de.marcermarc.veinminer</groupId>
     <artifactId>marcerVeinminer</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
 
     <!-- Publishing Strategy from https://stackoverflow.com/questions/14013644/hosting-a-maven-repository-on-github -->
 
