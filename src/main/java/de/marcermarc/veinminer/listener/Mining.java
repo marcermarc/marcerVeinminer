@@ -62,11 +62,11 @@ public class Mining implements Listener {
                 veinminer(bl, vm);
 
                 for (ItemStack d : vm.getDropBlocks()) {
-                    event.getPlayer().getWorld().dropItem(bl.getLocation().add(0, 1, 0), d);
+                    event.getPlayer().getWorld().dropItem(bl.getLocation().add(0.5, 0.2, 0.5), d);
                 }
 
                 if (vm.getDropExperiance() != 0) {
-                    (event.getPlayer().getWorld().spawn(bl.getLocation(), ExperienceOrb.class)).setExperience(vm.getDropExperiance());
+                    (event.getPlayer().getWorld().spawn(bl.getLocation().add(0.5, 0.2, 0.5), ExperienceOrb.class)).setExperience(vm.getDropExperiance());
                 }
 
                 if (vm.getMeta().getDamage() >= item.getType().getMaxDurability()) {
